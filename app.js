@@ -9,14 +9,21 @@ const bodyParser = require('body-parser');
 const sassMiddleware = require('node-sass-middleware');
 
 const index = require('./routes/index');
+const keys = require('./config/keys');
 
 const app = express();
 
-// Use GoogleStrategy for oauth login
-passport.use(new GoogleStrategy());
-
-// clientID:180268133397-fh05cicuq400gls922h027kmr2kc77r1.apps.googleusercontent.com
-// clientSecret: racM2uRNv84Hp2b7eG6jsOQv
+// Set up passport auth
+passport.use(new GoogleStrategy(
+  {
+    clientID: keys.googleClientID,
+    clientSecret: keys.googleClientSecret,
+    callbackURL: '/auth/google/callback',
+  },
+  (accessToken) => {
+    console.log(accessToken);
+  },
+));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
