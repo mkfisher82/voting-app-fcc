@@ -1,6 +1,4 @@
 const express = require('express');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require('path');
 // const favicon = require('serve-favicon');
 const logger = require('morgan');
@@ -8,22 +6,11 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const sassMiddleware = require('node-sass-middleware');
 
+require('./services/passport');
 const index = require('./routes/index');
-const keys = require('./config/keys');
+const auth = require('./routes/auth');
 
 const app = express();
-
-// Set up passport auth
-passport.use(new GoogleStrategy(
-  {
-    clientID: keys.googleClientID,
-    clientSecret: keys.googleClientSecret,
-    callbackURL: '/auth/google/callback',
-  },
-  (accessToken) => {
-    console.log(accessToken);
-  },
-));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -44,6 +31,7 @@ app.use(sassMiddleware({
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
+app.use('/auth', auth);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
