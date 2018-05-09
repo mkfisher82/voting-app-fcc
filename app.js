@@ -5,10 +5,16 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const sassMiddleware = require('node-sass-middleware');
+const mongoose = require('mongoose');
+const cookieSession = require('cookie-session');
+const passport = require('passport');
 
+require('./models/user');
 require('./services/passport');
+
 const index = require('./routes/index');
 const auth = require('./routes/auth');
+const keys = require('./config/keys');
 
 const app = express();
 
@@ -29,6 +35,15 @@ app.use(sassMiddleware({
   sourceMap: true,
 }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieSession({
+  maxAge: 30 * 24 * 60 * 60 * 1000,
+  keys: [keys.cookieKey],
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+mongoose.connect(keys.mongoURI);
 
 app.use('/', index);
 app.use('/auth', auth);
